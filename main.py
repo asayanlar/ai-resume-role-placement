@@ -92,3 +92,11 @@ plt.figure(figsize=(10,10))
 plt.imshow(wc, interpolation='bilinear')
 plt.axis("off")
 plt.show()
+
+var_mod = ['Category']
+le = LabelEncoder()
+resume_data_set['Category'] = le.fit_transform(resume_data_set['Category'])
+
+# print(resume_data_set.Category.value_counts())
+# print(resume_data_set_copy.Category.value_counts())
+del resume_data_set_copy
