@@ -96,3 +96,17 @@ plt.show()
 # Label the resumes based on their category using a numerical label
 le = LabelEncoder()
 resume_data_set['Category'] = le.fit_transform(resume_data_set['Category'])
+
+required_text = resume_data_set['Cleaned Resumed'].values
+required_target = resume_data_set['Category'].values
+
+# From all the cleaned resumes use the TF-IDF technique to:
+#   - Convert a collection of text documents to a matrix of token counts
+#   - and then to a normalized tf-idf representation.
+word_vectorizer = TfidfVectorizer(
+    sublinear_tf=True,
+    stop_words='english')
+word_vectorizer.fit(required_text)
+word_features = word_vectorizer.transform(required_text)
+
+print ("Feature completed .....")
