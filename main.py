@@ -110,3 +110,22 @@ word_vectorizer.fit(required_text)
 word_features = word_vectorizer.transform(required_text)
 
 print ("Feature completed .....")
+
+X_train,X_test,y_train,y_test = train_test_split(word_features,required_target,random_state=42, test_size=0.2,
+                                                 shuffle=True, stratify=required_target)
+
+# Don't train the model if the trained model exists already
+if not Path('./resume_parser_clf.pkl').is_file():
+    # The KNeighborsClassifier() is used to train the model into what category a resume should be
+    clf = OneVsRestClassifier(KNeighborsClassifier())
+    clf.fit(X_train, y_train)
+    # export the trained model
+    joblib.dump(clf, 'resume_parser_clf.pkl', compress=9)
+else:
+    clf = joblib.load('resume_parser_clf.pkl')
+
+prediction = clf.predict(X_test)
+
+print('Accuracy on training set: {:.2f}'.format(clf.score(X_train, y_train)))
+print('Accuracy on test set:     {:.2f}'.format(clf.score(X_test, y_test)))
+print("\n Classification report for classifier %s:\n%s\n" % (clf, metrics.classification_report(y_test, prediction)))
