@@ -3,8 +3,18 @@ from IPython.display import display
 import matplotlib.pyplot as plt 
 import matplotlib as mpl
 from matplotlib.gridspec import GridSpec
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
+from nltk.corpus import stopwords
+import string
+from wordcloud import WordCloud
 import string
 import re
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from scipy.sparse import hstack
 
 mpl.use('tkagg')
 cmap = plt.get_cmap('coolwarm')
@@ -46,13 +56,39 @@ print(resume_data_set.info())
 #     else:
 #         print(''.join(word.strip(string.punctuation)))
 resume = resume_data_set['Resume']
-resume_data_set['cleaned_resume'] = resume.str.replace(r'[^a-zA-Z0-9 ]+', ' ', regex=True).str.replace(r'[\s\s]+', ' ', regex=True)
+resume_data_set['cleaned_resume'] = resume.str.replace(r'[^a-zA-Z0-9\' ]+', ' ', regex=True).str.replace(r'[\s\s]+', ' ', regex=True)
 
-print(resume_data_set.at[0, 'cleaned_resume'])
-print(resume_data_set.head())
-print(resume_data_set.info())
+# print(resume_data_set.at[0, 'cleaned_resume'])
+# print(resume_data_set.head())
+# for x in range (0, 30):
+#     print(resume_data_set['cleaned_resume'][x])
+# print(resume_data_set.info())
 
-# for x in range(0, len(resume_data_set.index)):
-    # resume_data_set.at[x, 'Resume']
-    
+resume_data_set_copy=resume_data_set.copy()
 
+stop_words_set = set(stopwords.words('english')+['``',"''"])
+
+total_words =[]
+
+str_all_resumes = []
+for resume in resume_data_set['cleaned_resume']:
+    str_all_resumes += [resume]
+
+str_all_resumes = ''.join(str_all_resumes)
+
+token_resume_words = nltk.word_tokenize(''.join(str_all_resumes))
+
+for word in token_resume_words:
+    if word not in stop_words_set and word not in string.punctuation:
+        total_words.append(word)
+
+word_freq_dist = nltk.FreqDist(total_words)
+
+most_common_words = word_freq_dist.most_common(50)
+print(most_common_words)
+
+wc = WordCloud().generate(str_all_resumes)
+plt.figure(figsize=(10,10))
+plt.imshow(wc, interpolation='bilinear')
+plt.axis("off")
+plt.show()
